@@ -97,9 +97,9 @@ deletes its photos.
   Function (`supabase/functions/giphy`), which adds the key, asks for PG-rated results only, and
   returns just the links. It refuses anyone who is not signed in. We store only the GIPHY link on
   the visit (never a copy of the GIF), and the app only displays links on `giphy.com` over https.
-- **One-time setup:** add your key as a secret named `GIPHY_API_KEY`
-  (Supabase dashboard > Edge Functions > Secrets). Until you do, the GIF search panel says
-  "GIF search is not switched on yet."
+- **One-time setup:** add your key as an Edge Function secret named `GIPHY_API_KEY`
+  (Supabase dashboard > Edge Functions > Secrets). A secret named just `GIPHY` also works.
+  Until one exists, the GIF search panel says "GIF search is not switched on yet."
 - Privacy note: GIF searches go from our server to GIPHY, not from the user's browser, so GIPHY
   sees the server, not the user. The search words are sent, though.
 - GIPHY's terms require their "Powered by GIPHY" mark. The app shows text attribution for now;

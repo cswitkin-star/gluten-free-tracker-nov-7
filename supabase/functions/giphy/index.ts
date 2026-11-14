@@ -1,5 +1,6 @@
 // GIPHY proxy. Keeps the API key on the server and only answers signed-in users.
 // Set the key once:  Supabase dashboard > Edge Functions > Secrets > GIPHY_API_KEY
+// (a secret simply named GIPHY also works)
 import { cleanQuery, clampInt, mapGiphyResponse } from './mapGif.ts'
 
 const cors = {
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
   if (roleOf(req) !== 'authenticated') return json({ error: 'sign_in_required' }, 401)
 
-  const apiKey = Deno.env.get('GIPHY_API_KEY')
+  const apiKey = Deno.env.get('GIPHY_API_KEY') ?? Deno.env.get('GIPHY')
   if (!apiKey) return json({ error: 'not_configured' }, 503)
 
   let body: Record<string, unknown> = {}
