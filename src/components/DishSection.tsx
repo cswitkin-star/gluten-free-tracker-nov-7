@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { daysBetween, timeAgo, todayISO } from '../lib/dates'
 import { ALLERGEN_LABEL, GF_STATUS_LABEL } from '../lib/labels'
 import { STALE_DAYS } from '../match/match'
+import { usePhotos } from '../photos/usePhotos'
 import { useApp } from '../store/useApp'
+import { PhotoStrip, type PhotoControls } from './PhotoStrip'
+import type { DishPhoto } from '../photos/photos'
 import type { Allergen, Dish, GFStatus } from '../types'
 
 const STATUSES: GFStatus[] = ['gf_as_served', 'can_be_gf', 'not_gf']
@@ -52,7 +55,7 @@ function DishForm({ initial, onSave, onCancel }: { initial: FormValue; onSave: (
   )
 }
 
-function DishRow({ dish }: { dish: Dish }) {
+function DishRow({ dish, photos, ctrl }: { dish: Dish; photos: DishPhoto[]; ctrl: PhotoControls }) {
   const confirmDish = useApp((s) => s.confirmDish)
   const upsertDish = useApp((s) => s.upsertDish)
   const [editing, setEditing] = useState(false)
@@ -82,6 +85,7 @@ function DishRow({ dish }: { dish: Dish }) {
         {dish.allergens.map((a) => <span key={a} className="badge plain">Contains {ALLERGEN_LABEL[a].toLowerCase()}</span>)}
         {dish.source === 'user' && <span className="badge info">You edited this</span>}
       </div>
+      <PhotoStrip dishId={dish.id} dishName={dish.name} photos={photos} ctrl={ctrl} />
       <div className="row spread wrap">
         <span className={`small ${old ? '' : 'muted'}`}>{old ? '⚠ ' : ''}Confirmed {timeAgo(dish.lastConfirmed, today)}</span>
         <span className="row">
@@ -96,6 +100,7 @@ function DishRow({ dish }: { dish: Dish }) {
 export function DishSection({ restaurantId, dishes }: { restaurantId: string; dishes: Dish[] }) {
   const upsertDish = useApp((s) => s.upsertDish)
   const [adding, setAdding] = useState(false)
+  const photos = usePhotos(restaurantId)
   const order: Record<GFStatus, number> = { gf_as_served: 0, can_be_gf: 1, not_gf: 2 }
   const sorted = [...dishes].sort((a, b) => order[a.gfStatus] - order[b.gfStatus] || a.name.localeCompare(b.name))
 
@@ -109,8 +114,10 @@ export function DishSection({ restaurantId, dishes }: { restaurantId: string; di
         </div>
       )}
       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }} className="stack">
-        {sorted.map((d) => <DishRow key={d.id} dish={d} />)}
+        {sorted.map((d) => <DishRow key={d.id} dish={d} photos={photos.photos.filter((p) => p.dishId === d.id)} ctrl={photos} />)}
       </ul>
+      {photos.error && <div className="notice warn" role="alert">{photos.error}</div>}
+      {photos.available && <p className="muted small" style={{ margin: 0 }}>Photos are private to you. Location and camera details are removed before upload.</p>}
       {adding ? (
         <div className="card">
           <h3>Add a dish</h3>

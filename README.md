@@ -55,8 +55,8 @@ cp .env.example .env   # then fill in the two values
 `.env` is git-ignored. Restart `npm run dev` after changing it.
 
 Schema and sample data live in `supabase/migrations/` (already applied to the project).
-Row level security: the catalog is public **read** only. `user_data` is readable and writable
-only by its owner.
+Row level security: the catalog is public **read** only. `user_data`, `dish_photos` and the
+`dish-photos` bucket are readable and writable only by their owner.
 
 ### Accounts and sync
 
@@ -72,6 +72,19 @@ row in `user_data` and follow you across devices.
   on, new users must click a link before signing in.
 - Edits are last-write-wins. Two devices changing the same thing at once can overwrite each other.
 
+### Dish photos
+
+Signed-in users can add photos to any dish (Restaurant page > Add a photo).
+
+- **Private:** photos are visible only to the person who uploaded them. There is no moderation
+  yet, so nothing is public. Files live in the private `dish-photos` bucket under `<user id>/`,
+  and the app shows them through links that expire after an hour.
+- **Privacy by default:** every photo is re-encoded in the browser as a JPEG no larger than
+  1600px, which also removes location and camera metadata before upload.
+- Limits: 5 MB per file (enforced by the bucket) and 100 photos per person (enforced by a trigger).
+- "Erase my data" on the Profile page also deletes your photos.
+- Photos need an account and a connection; they are not stored offline.
+
 Not connected yet: live group voting (votes still return as links).
 
 ## How it is organized
@@ -82,6 +95,7 @@ src/
   match/            personal match engine (pure functions, tested)
   data/             CatalogRepo, local + Supabase implementations, seed/ sample data
   sync/             account sync: merge logic (tested) and the push/pull engine
+  photos/           private dish photos: resize + upload to Supabase Storage
   store/            local state (persisted in the browser) and merged data hook
   group/            shortlist + share-link encoding
   copy/             all safety wording and disclaimers, in one reviewable place
