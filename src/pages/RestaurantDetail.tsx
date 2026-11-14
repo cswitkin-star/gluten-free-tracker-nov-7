@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
 import { DishSection } from '../components/DishSection'
+import { ShareButton } from '../components/ShareButton'
 import { MatchBadge } from '../components/MatchBadge'
 import { ReviewSection } from '../components/ReviewSection'
 import { SafetyPanel } from '../components/SafetyPanel'
 import { DISCLAIMER_LONG, SAMPLE_DATA_NOTICE } from '../copy'
 import { formatHour } from '../lib/dates'
+import { inviteUrl, toShareOption } from '../group/share'
 import { PRICE_LABEL } from '../lib/labels'
 import { computeMatch } from '../match/match'
 import { useApp } from '../store/useApp'
@@ -57,6 +59,12 @@ export default function RestaurantDetail() {
         <button className="btn" aria-pressed={saved} onClick={() => toggleSaved(id)}>{saved ? '★ Saved' : '☆ Save'}</button>
         <Link className="btn secondary" to={`/order-card?r=${id}`}>Order card</Link>
         <Link className="btn secondary" to={`/log/new?r=${id}`}>I ate here</Link>
+        <ShareButton
+          className="btn secondary"
+          label="Suggest this place"
+          text={`How about ${r.name} in ${r.neighborhood}?`}
+          url={inviteUrl({ v: 1, g: `s_${r.id}`, t: `How about ${r.name}?`, n: 2, o: [toShareOption(r)] })}
+        />
       </div>
 
       <p className="muted" style={{ margin: 0 }}>{r.blurb}</p>

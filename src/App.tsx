@@ -1,15 +1,19 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import Discover from './pages/Discover'
+import GroupDetail from './pages/GroupDetail'
+import Groups from './pages/Groups'
 import Log from './pages/Log'
 import NewVisit from './pages/NewVisit'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
 import RestaurantDetail from './pages/RestaurantDetail'
+import Tally from './pages/Tally'
+import Vote from './pages/Vote'
 import { useApp } from './store/useApp'
 
 // Routes that must work for people who have never set up a profile (e.g. friends voting on a shared link).
-const PUBLIC_PREFIXES = ['/onboarding', '/vote']
-const NO_TABBAR_PREFIXES = ['/onboarding', '/vote', '/order-card']
+const PUBLIC_PREFIXES = ['/onboarding', '/vote', '/tally']
+const NO_TABBAR_PREFIXES = ['/onboarding', '/vote', '/tally', '/order-card']
 
 export default function App() {
   const onboarded = useApp((s) => s.profile.onboarded)
@@ -25,6 +29,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Discover />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/groups" element={<Groups />} />
+          <Route path="/groups/:id" element={<GroupDetail />} />
+          <Route path="/vote/:payload" element={<Vote />} />
+          <Route path="/tally/:payload" element={<Tally />} />
           <Route path="/log" element={<Log />} />
           <Route path="/log/new" element={<NewVisit />} />
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
@@ -35,6 +43,7 @@ export default function App() {
       {!hideTabs && (
         <nav className="tabbar" aria-label="Main">
           <NavLink to="/" end><span className="ico" aria-hidden>🔍</span>Discover</NavLink>
+          <NavLink to="/groups"><span className="ico" aria-hidden>👥</span>Groups</NavLink>
           <NavLink to="/log"><span className="ico" aria-hidden>📓</span>My list</NavLink>
           <NavLink to="/profile"><span className="ico" aria-hidden>👤</span>Profile</NavLink>
         </nav>
