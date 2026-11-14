@@ -55,7 +55,7 @@ cp .env.example .env   # then fill in the two values
 `.env` is git-ignored. Restart `npm run dev` after changing it.
 
 Schema and sample data live in `supabase/migrations/` (already applied to the project).
-Row level security: the catalog is public **read** only. `user_data`, `dish_photos` and the
+Row level security: the catalog is public **read** only. `user_data`, `dish_photos`, `visit_photos` and the
 `dish-photos` bucket are readable and writable only by their owner.
 
 ### Accounts and sync
@@ -85,6 +85,26 @@ Signed-in users can add photos to any dish (Restaurant page > Add a photo).
 - "Erase my data" on the Profile page also deletes your photos.
 - Photos need an account and a connection; they are not stored offline.
 
+### Visit photos and GIFs
+
+When you log a visit (My list > Log a visit) you can attach up to 6 photos and one GIF. Both need
+an account. You can also add or remove photos later from the visit's card, and deleting a visit
+deletes its photos.
+
+- Visit photos follow the same rules as dish photos: private to you, shrunk to JPEG, metadata
+  removed, same private bucket. Table: `visit_photos` (6 per visit, 100 per person, trigger-enforced).
+- GIFs come from GIPHY. The browser never sees the GIPHY key: the app calls a Supabase Edge
+  Function (`supabase/functions/giphy`), which adds the key, asks for PG-rated results only, and
+  returns just the links. It refuses anyone who is not signed in. We store only the GIPHY link on
+  the visit (never a copy of the GIF), and the app only displays links on `giphy.com` over https.
+- **One-time setup:** add your key as a secret named `GIPHY_API_KEY`
+  (Supabase dashboard > Edge Functions > Secrets). Until you do, the GIF search panel says
+  "GIF search is not switched on yet."
+- Privacy note: GIF searches go from our server to GIPHY, not from the user's browser, so GIPHY
+  sees the server, not the user. The search words are sent, though.
+- GIPHY's terms require their "Powered by GIPHY" mark. The app shows text attribution for now;
+  add their official logo before launching with a production key.
+
 Not connected yet: live group voting (votes still return as links).
 
 ## How it is organized
@@ -95,7 +115,8 @@ src/
   match/            personal match engine (pure functions, tested)
   data/             CatalogRepo, local + Supabase implementations, seed/ sample data
   sync/             account sync: merge logic (tested) and the push/pull engine
-  photos/           private dish photos: resize + upload to Supabase Storage
+  photos/           private dish + visit photos: resize + upload to Supabase Storage
+  gifs/             GIPHY search through the Supabase Edge Function
   store/            local state (persisted in the browser) and merged data hook
   group/            shortlist + share-link encoding
   copy/             all safety wording and disclaimers, in one reviewable place

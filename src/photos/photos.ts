@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { toCleanJpeg } from './image'
 
-const BUCKET = 'dish-photos'
+export const BUCKET = 'dish-photos'
 const URL_TTL_SECONDS = 60 * 60
 
 export interface DishPhoto {
@@ -16,6 +16,16 @@ export interface DishPhoto {
 
 /** "<user id>/<random>.jpg". The first folder must be the user's id (storage rules enforce it). */
 export const photoPath = (userId: string, id: string = crypto.randomUUID()) => `${userId}/${id}.jpg`
+
+/** Temporary viewing links for private files. Missing files are simply left out. */
+export async function signUrls(paths: string[]): Promise<Map<string, string>> {
+  if (!paths.length) return new Map()
+  const { data, error } = await need().storage.from(BUCKET).createSignedUrls(paths, URL_TTL_SECONDS)
+  if (error) throw error
+  const urls = new Map<string, string>()
+  for (const s of data) if (s.path && s.signedUrl) urls.set(s.path, s.signedUrl)
+  return urls
+}
 
 const need = () => {
   if (!supabase) throw new Error('Photos are not available right now.')
@@ -32,9 +42,7 @@ export async function listPhotos(restaurantId: string): Promise<DishPhoto[]> {
     .order('created_at', { ascending: false })
   if (error) throw error
   if (!data.length) return []
-  const { data: signed, error: signErr } = await sb.storage.from(BUCKET).createSignedUrls(data.map((r) => r.path), URL_TTL_SECONDS)
-  if (signErr) throw signErr
-  const urls = new Map(signed.map((s) => [s.path, s.signedUrl]))
+  const urls = await signUrls(data.map((r) => r.path))
   return data
     .filter((r) => urls.get(r.path))
     .map((r) => ({
@@ -63,13 +71,15 @@ export async function removePhoto(photo: Pick<DishPhoto, 'id' | 'path'>): Promis
   await sb.storage.from(BUCKET).remove([photo.path])
 }
 
-/** Removes every photo you uploaded (used by "Erase my data"). */
+/** Removes every photo you uploaded, dish and visit photos alike (used by "Erase my data"). */
 export async function removeAllMyPhotos(): Promise<void> {
   const sb = need()
-  const { data, error } = await sb.from('dish_photos').select('id, path')
-  if (error) throw error
-  if (!data.length) return
-  const rows = await sb.from('dish_photos').delete().in('id', data.map((r) => r.id))
-  if (rows.error) throw rows.error
-  await sb.storage.from(BUCKET).remove(data.map((r) => r.path))
+  for (const table of ['dish_photos', 'visit_photos'] as const) {
+    const { data, error } = await sb.from(table).select('id, path')
+    if (error) throw error
+    if (!data.length) continue
+    const rows = await sb.from(table).delete().in('id', data.map((r) => r.id))
+    if (rows.error) throw rows.error
+    await sb.storage.from(BUCKET).remove(data.map((r) => r.path))
+  }
 }

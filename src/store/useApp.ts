@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { todayISO } from '../lib/dates'
-import type { Dish, Outcome, Profile, RestaurantSafety, Review, Visit } from '../types'
+import type { Dish, Gif, Outcome, Profile, RestaurantSafety, Review, Visit } from '../types'
 
 export const DEFAULT_PROFILE: Profile = {
   tolerance: 'celiac',
@@ -29,7 +29,7 @@ interface AppState {
   setProfile: (p: Partial<Profile>) => void
   resetAll: () => void
   toggleSaved: (restaurantId: string) => void
-  addVisit: (v: { restaurantId: string; dishesOrdered: string[]; outcome: Outcome; notes: string; date?: string }) => Visit
+  addVisit: (v: { restaurantId: string; dishesOrdered: string[]; outcome: Outcome; notes: string; date?: string; gif?: Gif }) => Visit
   removeVisit: (id: string) => void
   upsertDish: (d: Omit<Dish, 'id' | 'source' | 'lastConfirmed'> & { id?: string }) => void
   /** "Still accurate?" on a dish. */

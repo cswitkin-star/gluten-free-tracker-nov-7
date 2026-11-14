@@ -1,10 +1,14 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { RestaurantCard } from '../components/RestaurantCard'
+import { VisitMedia } from '../components/VisitMedia'
 import { patternHints } from '../log/patterns'
 import { OUTCOME_LABEL } from '../lib/labels'
 import { useMatches } from '../match/useMatches'
+import { removePhotosForVisit } from '../photos/visitPhotos'
+import { useVisitPhotos } from '../photos/useVisitPhotos'
 import { useApp } from '../store/useApp'
+import { useAuth } from '../store/useAuth'
 import { useData } from '../store/useCatalog'
 import type { Outcome } from '../types'
 
@@ -17,6 +21,8 @@ export default function Log() {
   const visits = useApp((s) => s.visits)
   const toggleSaved = useApp((s) => s.toggleSaved)
   const removeVisit = useApp((s) => s.removeVisit)
+  const signedIn = useAuth((s) => !!s.user)
+  const media = useVisitPhotos(visits.map((v) => v.id))
 
   const hints = useMemo(() => patternHints(visits, data), [visits, data])
   const savedItems = items.filter((i) => saved.includes(i.restaurant.id))
@@ -67,6 +73,7 @@ export default function Log() {
 
       <section className="stack" aria-labelledby="visits-h">
         <h2 id="visits-h">Visits</h2>
+        {media.error && <div className="notice warn" role="alert">{media.error}</div>}
         {visits.length === 0 ? (
           <div className="empty card">
             <div className="big" aria-hidden>📓</div>
@@ -86,7 +93,27 @@ export default function Log() {
                 </div>
                 {v.dishesOrdered.length > 0 && <p style={{ margin: 0 }}><strong>Ordered:</strong> {v.dishesOrdered.join(', ')}</p>}
                 {v.notes && <p style={{ margin: 0 }}>{v.notes}</p>}
-                <div><button className="chip" onClick={() => { if (window.confirm('Delete this visit?')) removeVisit(v.id) }}>Delete</button></div>
+                <VisitMedia visit={v} photos={media.photos.filter((p) => p.visitId === v.id)} ctrl={media} />
+                <div>
+                  <button
+                    className="chip"
+                    onClick={async () => {
+                      if (!window.confirm('Delete this visit and its photos?')) return
+                      if (signedIn) {
+                        try {
+                          await removePhotosForVisit(v.id)
+                        } catch (err) {
+                          console.error('Could not delete visit photos:', err)
+                          window.alert('Could not delete this visit’s photos. Check your connection and try again. Nothing was deleted.')
+                          return
+                        }
+                      }
+                      removeVisit(v.id)
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </article>
             )
           })

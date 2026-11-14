@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { GifPicker } from '../components/GifPicker'
+import { VisitPhotoPicker } from '../components/VisitPhotoPicker'
 import { todayISO } from '../lib/dates'
 import { FRYER_LABEL, KITCHEN_LABEL, OUTCOME_LABEL, STAFF_LABEL } from '../lib/labels'
+import { addVisitPhoto } from '../photos/visitPhotos'
 import { useApp } from '../store/useApp'
+import { useAuth } from '../store/useAuth'
 import { useData } from '../store/useCatalog'
-import type { Outcome } from '../types'
+import type { Gif, Outcome } from '../types'
 
 const OUTCOMES: Outcome[] = ['fine', 'mild', 'glutened']
 
@@ -22,6 +26,11 @@ export default function NewVisit() {
   const [date, setDate] = useState(todayISO())
   const [notes, setNotes] = useState('')
   const [doneFor, setDoneFor] = useState<string | null>(null)
+  const [files, setFiles] = useState<File[]>([])
+  const [gif, setGif] = useState<Gif | null>(null)
+  const [saving, setSaving] = useState('')
+  const [failedUploads, setFailedUploads] = useState(0)
+  const userId = useAuth((s) => s.user?.id ?? null)
 
   const dishes = restaurantId ? data.getDishes(restaurantId) : []
 
@@ -44,17 +53,37 @@ export default function NewVisit() {
             <button className="btn" onClick={() => { updateSafety(doneFor, {}); nav('/log') }}>Yes, still accurate</button>
             <Link className="btn secondary" to={`/restaurant/${doneFor}`}>Something changed</Link>
           </div>
+          {failedUploads > 0 && (
+            <div className="notice warn" role="alert">
+              {failedUploads === 1 ? '1 photo' : `${failedUploads} photos`} could not upload. Your visit is saved. You can add photos again from My list.
+            </div>
+          )}
           <button className="chip" onClick={() => nav('/log')}>Skip for now</button>
         </div>
       </div>
     )
   }
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!restaurantId) return
+    if (!restaurantId || saving) return
     const extra = other.split(',').map((x) => x.trim()).filter(Boolean)
-    addVisit({ restaurantId, dishesOrdered: [...picked, ...extra], outcome, notes: notes.trim(), date })
+    // The visit is saved first, so it is never lost if a photo fails to upload.
+    const visit = addVisit({ restaurantId, dishesOrdered: [...picked, ...extra], outcome, notes: notes.trim(), date, gif: gif ?? undefined })
+    let failed = 0
+    if (userId && files.length) {
+      for (let i = 0; i < files.length; i++) {
+        setSaving(`Uploading photo ${i + 1} of ${files.length}…`)
+        try {
+          await addVisitPhoto(userId, files[i], visit.id, restaurantId)
+        } catch (err) {
+          console.error('Photo upload failed:', err)
+          failed++
+        }
+      }
+    }
+    setSaving('')
+    setFailedUploads(failed)
     setDoneFor(restaurantId)
   }
 
@@ -103,8 +132,13 @@ export default function NewVisit() {
         <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
       </label>
 
+      <VisitPhotoPicker files={files} onChange={setFiles} disabled={!!saving} />
+      <GifPicker gif={gif} onChange={setGif} />
+
       <div className="sticky-actions">
-        <button className="btn block" type="submit" disabled={!restaurantId}>Save visit</button>
+        <button className="btn block" type="submit" disabled={!restaurantId || !!saving} aria-live="polite">
+          {saving || 'Save visit'}
+        </button>
       </div>
     </form>
   )

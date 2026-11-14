@@ -88,6 +88,16 @@ export interface Review {
   sample: boolean
 }
 
+/** A GIF picked from GIPHY. We store links only, never copies of the GIF. */
+export interface Gif {
+  id: string
+  title: string
+  url: string
+  previewUrl: string
+  width: number
+  height: number
+}
+
 export interface Visit {
   id: string
   restaurantId: string
@@ -95,6 +105,7 @@ export interface Visit {
   outcome: Outcome
   date: string
   notes: string
+  gif?: Gif
 }
 
 export interface Catalog {
