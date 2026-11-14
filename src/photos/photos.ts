@@ -14,8 +14,14 @@ export interface DishPhoto {
   url: string
 }
 
+/** A random id. randomUUID only exists on https and localhost, so testing over a local network link needs the fallback. */
+function randomId(): string {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 /** "<user id>/<random>.jpg". The first folder must be the user's id (storage rules enforce it). */
-export const photoPath = (userId: string, id: string = crypto.randomUUID()) => `${userId}/${id}.jpg`
+export const photoPath = (userId: string, id: string = randomId()) => `${userId}/${id}.jpg`
 
 /** Temporary viewing links for private files. Missing files are simply left out. */
 export async function signUrls(paths: string[]): Promise<Map<string, string>> {
