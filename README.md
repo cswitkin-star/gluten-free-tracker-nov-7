@@ -21,9 +21,9 @@ outings. Built with React, Vite and TypeScript. **Frontend only for now:** no ba
 
 ## Known limitations
 
-- Group votes are not live. With no server, each friend sends their votes back as a link.
+- Group votes are not live: each friend sends their votes back as a link.
   Share links only work for others once the app is hosted somewhere they can reach (not `localhost`).
-- The catalog comes from Supabase, but your own data lives in one browser (localStorage). There are no accounts yet, and no sync between devices.
+- The catalog comes from Supabase, but without an account your own data lives in one browser (localStorage). With an account it syncs between devices.
 - Restaurants, dishes, reviews and safety facts are invented samples. Map tiles come from OpenStreetMap.
 - Menu parsing with the Claude API and Google Places ingest are not built (they need a backend or keys).
 
@@ -55,10 +55,24 @@ cp .env.example .env   # then fill in the two values
 `.env` is git-ignored. Restart `npm run dev` after changing it.
 
 Schema and sample data live in `supabase/migrations/` (already applied to the project).
-Row level security allows public **read** only; nothing can be written through the API yet.
-Your profile, saved places, visits, edits and group votes still live in this browser.
+Row level security: the catalog is public **read** only. `user_data` is readable and writable
+only by its owner.
 
-Not connected yet: accounts (Supabase Auth), syncing your own data, and live group voting.
+### Accounts and sync
+
+Signing in is optional (Profile > Account, email and password). When signed in, your profile,
+saved places, visit log, dish and safety edits, own reviews and groups are saved to one private
+row in `user_data` and follow you across devices.
+
+- First sign-in on a device merges what is already here with your account. After that, your
+  account's copy wins on load, so deletions on another device stick.
+- Changes save a moment after you make them. If a save fails, you will see a retry button, and
+  signing out refuses to clear the device until your latest changes are saved.
+- Email confirmation is a Supabase dashboard setting (Authentication > Providers > Email). With it
+  on, new users must click a link before signing in.
+- Edits are last-write-wins. Two devices changing the same thing at once can overwrite each other.
+
+Not connected yet: live group voting (votes still return as links).
 
 ## How it is organized
 
@@ -66,7 +80,8 @@ Not connected yet: accounts (Supabase Auth), syncing your own data, and live gro
 src/
   types.ts          data model (mirrors the planned Postgres tables)
   match/            personal match engine (pure functions, tested)
-  data/             CatalogRepo interface, LocalCatalogRepo, seed/ sample data
+  data/             CatalogRepo, local + Supabase implementations, seed/ sample data
+  sync/             account sync: merge logic (tested) and the push/pull engine
   store/            local state (persisted in the browser) and merged data hook
   group/            shortlist + share-link encoding
   copy/             all safety wording and disclaimers, in one reviewable place

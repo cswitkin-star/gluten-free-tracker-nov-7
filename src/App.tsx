@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import Discover from './pages/Discover'
 import GroupDetail from './pages/GroupDetail'
@@ -11,6 +12,7 @@ import RestaurantDetail from './pages/RestaurantDetail'
 import Tally from './pages/Tally'
 import Vote from './pages/Vote'
 import { useApp } from './store/useApp'
+import { startSync } from './sync/engine'
 
 // Routes that must work for people who have never set up a profile (e.g. friends voting on a shared link).
 const PUBLIC_PREFIXES = ['/onboarding', '/vote', '/tally']
@@ -18,6 +20,7 @@ const NO_TABBAR_PREFIXES = ['/onboarding', '/vote', '/tally', '/order-card']
 
 export default function App() {
   const onboarded = useApp((s) => s.profile.onboarded)
+  useEffect(() => startSync(), [])
   const { pathname } = useLocation()
   const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))
   const hideTabs = NO_TABBAR_PREFIXES.some((p) => pathname.startsWith(p))

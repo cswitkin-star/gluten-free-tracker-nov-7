@@ -6,7 +6,10 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
 /** True when both env vars are set. Otherwise the app runs on bundled sample data. */
 export const supabaseConfigured = Boolean(url && key)
 
-/** Browser client using the publishable key. Row level security decides what it can read. */
+/**
+ * Browser client using the publishable key. Row level security decides what it can read.
+ * The sign-in session is kept in this browser so people stay signed in.
+ */
 export const supabase: SupabaseClient | null = supabaseConfigured
-  ? createClient(url!, key!, { auth: { persistSession: false } })
+  ? createClient(url!, key!, { auth: { persistSession: true, autoRefreshToken: true } })
   : null
