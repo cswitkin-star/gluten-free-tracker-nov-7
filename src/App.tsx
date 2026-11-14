@@ -2,6 +2,7 @@ import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import Discover from './pages/Discover'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
+import RestaurantDetail from './pages/RestaurantDetail'
 import { useApp } from './store/useApp'
 
 // Routes that must work for people who have never set up a profile (e.g. friends voting on a shared link).
@@ -22,6 +23,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Discover />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
