@@ -4,11 +4,20 @@ import { catalogRepo } from '../data'
 import type { Catalog, Dish, Restaurant, RestaurantSafety, Review } from '../types'
 import { useApp } from './useApp'
 
+// One shared in-flight request, so several components asking at once only hit the backend once.
+let inflight: Promise<void> | null = null
+
 const useCatalogStore = create<{ catalog: Catalog | null; load: () => Promise<void> }>((set, get) => ({
   catalog: null,
-  load: async () => {
-    if (get().catalog) return
-    set({ catalog: await catalogRepo.load() })
+  load: () => {
+    if (get().catalog) return Promise.resolve()
+    inflight ??= catalogRepo
+      .load()
+      .then((catalog) => set({ catalog }))
+      .finally(() => {
+        inflight = null
+      })
+    return inflight
   },
 }))
 

@@ -23,7 +23,7 @@ outings. Built with React, Vite and TypeScript. **Frontend only for now:** no ba
 
 - Group votes are not live. With no server, each friend sends their votes back as a link.
   Share links only work for others once the app is hosted somewhere they can reach (not `localhost`).
-- Data lives in one browser (localStorage). There are no accounts, and no sync between devices.
+- The catalog comes from Supabase, but your own data lives in one browser (localStorage). There are no accounts yet, and no sync between devices.
 - Restaurants, dishes, reviews and safety facts are invented samples. Map tiles come from OpenStreetMap.
 - Menu parsing with the Claude API and Google Places ingest are not built (they need a backend or keys).
 
@@ -37,10 +37,28 @@ npm run typecheck
 npm run build
 ```
 
-## Environment variables
+## Backend (Supabase)
 
-None needed today. `.env.example` lists the keys a future backend would use
-(Supabase, Google Places). Put real keys only in a local `.env`, which is git-ignored.
+The restaurant catalog (restaurants, safety signals, dishes, reviews) is read from Supabase.
+If the env vars below are missing or the request fails, the app falls back to the bundled
+sample data so it always opens.
+
+```bash
+cp .env.example .env   # then fill in the two values
+```
+
+| Variable | What it is |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Project URL, e.g. `https://<ref>.supabase.co` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | The **publishable** key (Project Settings > API). Never the secret/service key. |
+
+`.env` is git-ignored. Restart `npm run dev` after changing it.
+
+Schema and sample data live in `supabase/migrations/` (already applied to the project).
+Row level security allows public **read** only; nothing can be written through the API yet.
+Your profile, saved places, visits, edits and group votes still live in this browser.
+
+Not connected yet: accounts (Supabase Auth), syncing your own data, and live group voting.
 
 ## How it is organized
 
