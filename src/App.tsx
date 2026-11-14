@@ -1,13 +1,8 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
+import Discover from './pages/Discover'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
 import { useApp } from './store/useApp'
-import { useData } from './store/useCatalog'
-
-function Discover() {
-  const { ready, data } = useData()
-  return <p className="muted">{ready ? `${data.restaurants.length} sample restaurants loaded.` : 'Loading…'}</p>
-}
 
 // Routes that must work for people who have never set up a profile (e.g. friends voting on a shared link).
 const PUBLIC_PREFIXES = ['/onboarding', '/vote']
