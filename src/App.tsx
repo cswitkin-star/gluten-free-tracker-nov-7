@@ -1,5 +1,7 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import Discover from './pages/Discover'
+import Log from './pages/Log'
+import NewVisit from './pages/NewVisit'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
 import RestaurantDetail from './pages/RestaurantDetail'
@@ -23,6 +25,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Discover />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/log" element={<Log />} />
+          <Route path="/log/new" element={<NewVisit />} />
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -31,6 +35,7 @@ export default function App() {
       {!hideTabs && (
         <nav className="tabbar" aria-label="Main">
           <NavLink to="/" end><span className="ico" aria-hidden>🔍</span>Discover</NavLink>
+          <NavLink to="/log"><span className="ico" aria-hidden>📓</span>My list</NavLink>
           <NavLink to="/profile"><span className="ico" aria-hidden>👤</span>Profile</NavLink>
         </nav>
       )}
