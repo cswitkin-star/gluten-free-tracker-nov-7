@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { MapView } from '../components/MapView'
 import { RestaurantCard } from '../components/RestaurantCard'
-import { SAMPLE_DATA_NOTICE } from '../copy'
+import { DISCLAIMER_SHORT, SAMPLE_DATA_NOTICE } from '../copy'
 import { isOpenAt, nycHourNow } from '../lib/dates'
 import { TOLERANCE_LABEL } from '../lib/labels'
 import { LABEL_RANK } from '../match/match'
@@ -45,11 +46,14 @@ export default function Discover() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Find a spot</h1>
-        <p className="muted" style={{ margin: 0 }}>
-          Matched for you: <strong>{TOLERANCE_LABEL[tolerance]}</strong>
-        </p>
+      <div className="row spread" style={{ alignItems: 'flex-start' }}>
+        <div>
+          <h1>Find a spot</h1>
+          <p className="muted" style={{ margin: 0 }}>
+            Matched for you: <strong>{TOLERANCE_LABEL[tolerance]}</strong>
+          </p>
+        </div>
+        <Link className="btn secondary" to="/order-card">Order card</Link>
       </div>
 
       <label className="field">
@@ -107,6 +111,7 @@ export default function Discover() {
       )}
 
       <div className="notice">{SAMPLE_DATA_NOTICE}</div>
+      <p className="muted small">{DISCLAIMER_SHORT}</p>
     </div>
   )
 }

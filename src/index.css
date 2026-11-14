@@ -157,3 +157,5 @@ textarea { min-height: 96px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* The order card takes over the whole screen */
+.app:has(.order-card) .page { padding: 0; }

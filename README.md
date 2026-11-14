@@ -7,6 +7,26 @@ outings. Built with React, Vite and TypeScript. **Frontend only for now:** no ba
 > All restaurants, dishes and reviews are **invented sample data**. Nothing in the app is a
 > guarantee of safety. Always confirm with the restaurant.
 
+## What is in the MVP
+
+- Onboarding and a tolerance profile (Celiac / strict, Sensitive, Preference) with optional toggles.
+- Discover: map + list, search, cuisine, neighborhood, price and open-now filters, and a personal
+  match label (Great for you / Workable / Skip) with a one-line reason.
+- Restaurant detail: safety signals kept apart from taste, dish tags (GF as served, can be made GF,
+  not GF) with "what to ask for", last-confirmed dates, "Still accurate?", and reviews that show the
+  reviewer's tolerance level.
+- My list: saved places, a private dining log, pattern hints.
+- Group dinners: shortlist builder, a share link, a no-account vote page, and vote merging.
+- Order card: a full-screen card for a server, tailored to your profile.
+
+## Known limitations
+
+- Group votes are not live. With no server, each friend sends their votes back as a link.
+  Share links only work for others once the app is hosted somewhere they can reach (not `localhost`).
+- Data lives in one browser (localStorage). There are no accounts, and no sync between devices.
+- Restaurants, dishes, reviews and safety facts are invented samples. Map tiles come from OpenStreetMap.
+- Menu parsing with the Claude API and Google Places ingest are not built (they need a backend or keys).
+
 ## Setup
 
 ```bash

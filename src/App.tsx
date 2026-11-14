@@ -4,6 +4,7 @@ import GroupDetail from './pages/GroupDetail'
 import Groups from './pages/Groups'
 import Log from './pages/Log'
 import NewVisit from './pages/NewVisit'
+import OrderCard from './pages/OrderCard'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
 import RestaurantDetail from './pages/RestaurantDetail'
@@ -29,6 +30,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Discover />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/order-card" element={<OrderCard />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:id" element={<GroupDetail />} />
           <Route path="/vote/:payload" element={<Vote />} />
