@@ -89,13 +89,16 @@ p { margin: 0 0 0.6rem; }
   padding: 14px; box-shadow: var(--shadow);
 }
 a.card { display: block; text-decoration: none; color: inherit; }
+/* Buttons follow the Figma "Button" component: Primary has an 8px radius, Secondary 12px.
+   Both are 48px tall with 18px side padding, a 2px border and 16px bold text. */
 .btn {
-  min-height: var(--tap); padding: 0 18px; border-radius: 999px; border: 2px solid var(--brand);
-  background: var(--brand); color: var(--brand-ink); font-weight: 700; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
+  min-height: var(--tap); padding: 0 18px; border-radius: 8px; border: 2px solid var(--brand);
+  background: var(--brand); color: var(--brand-ink); font-size: 1rem; font-weight: 700; line-height: 1.2;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  text-decoration: none;
 }
-.btn.secondary { background: transparent; color: var(--brand); }
-.btn.danger { background: transparent; color: var(--skip-ink); border-color: var(--skip-ink); }
+.btn.secondary { background: transparent; color: var(--brand); border-radius: 12px; }
+.btn.danger { background: transparent; color: var(--skip-ink); border-color: var(--skip-ink); border-radius: 12px; }
 .btn.block { width: 100%; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:focus-visible, .chip:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
