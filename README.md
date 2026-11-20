@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/social-preview.png" alt="Gluten-Free Dining NYC: Eat out, without the guesswork." width="100%">
+</p>
+
 # Gluten-Free Dining NYC (MVP)
 
 A mobile-first web app that helps people who eat gluten-free find NYC restaurants that fit
@@ -6,6 +10,23 @@ outings. Built with React, Vite and TypeScript. **Frontend only for now:** no ba
 
 > All restaurants, dishes and reviews are **invented sample data**. Nothing in the app is a
 > guarantee of safety. Always confirm with the restaurant.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-onboarding.png" width="190" alt="Onboarding: choose how you eat gluten-free"><br><sub>Set your tolerance</sub></td>
+    <td align="center"><img src="docs/screenshots/02-discover.png" width="190" alt="Discover: restaurants with personal match labels"><br><sub>Find a spot</sub></td>
+    <td align="center"><img src="docs/screenshots/03-restaurant.png" width="190" alt="Restaurant detail with safety signals"><br><sub>Safety signals, kept apart from taste</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/04-my-list.png" width="190" alt="My safe list and dining log"><br><sub>Your private safe list</sub></td>
+    <td align="center"><img src="docs/screenshots/05-order-card.png" width="190" alt="Full-screen order card to show a server"><br><sub>Order card for your server</sub></td>
+    <td></td>
+  </tr>
+</table>
+
+<sub>Screenshots use the invented sample data. Regenerate them with the dev server running.</sub>
 
 ## What is in the MVP
 
