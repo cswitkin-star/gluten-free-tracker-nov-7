@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/social-preview.png" alt="Gluten-Free Dining NYC: Eat out, without the guesswork." width="100%">
+</p>
+
 # Gluten-Free Dining NYC (MVP)
 
 A mobile-first web app that helps people who eat gluten-free find NYC restaurants that fit
